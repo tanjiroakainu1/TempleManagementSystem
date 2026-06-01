@@ -1,0 +1,48 @@
+{
+  "name": "temple-management-system",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n api,web -c magenta,cyan \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "vite",
+    "dev:server": "npm run dev:free-port && tsx watch server/index.ts",
+    "dev:free-port": "lsof -ti:3001 | xargs kill -9 2>/dev/null || true",
+    "test:ai": "curl -s http://localhost:3001/api/temple-ai/health && echo && curl -s -X POST http://localhost:3001/api/temple-ai/chat -H 'Content-Type: application/json' -d '{\"messages\":[{\"role\":\"system\",\"content\":\"You are Candy Oracle. Answer anything briefly.\"},{\"role\":\"user\",\"content\":\"What is 5+5 and who is super admin demo?\"}]}'",
+    "vercel-build": "npm run build",
+    "build": "tsc -b && vite build",
+    "check": "tsc -b --noEmit",
+    "preview": "vite preview",
+    "start": "node dist-server/index.js",
+    "build:server": "tsc -p tsconfig.server.json"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.11.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "recharts": "^3.8.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vercel/node": "^5.8.8",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
+  }
+}
