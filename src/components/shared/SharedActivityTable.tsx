@@ -54,10 +54,10 @@ export default function SharedActivityTable({
       />
       <CardBody className="p-0">
         {loading ? (
-          <p className="text-candy-400 text-center py-10 font-medium">Loading shared records...</p>
+          <p className="text-candy-400 text-center py-10 font-medium">Loading activity…</p>
         ) : !display.length ? (
           <p className="text-candy-400 text-center py-10">
-            No activity yet. CRUD actions will appear here for everyone.
+            No activity yet. Updates from all roles will appear here.
           </p>
         ) : (
           <div className="table-scroll">

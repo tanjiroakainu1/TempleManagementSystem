@@ -119,6 +119,38 @@ export function getModuleCounts(): ChartPoint[] {
   ];
 }
 
+export function getMaintenanceByStatus(): ChartPoint[] {
+  return countBy(getStore().maintenance_records, (m) => String(m.status || 'open'));
+}
+
+export function getEducationByStatus(): ChartPoint[] {
+  return countBy(getStore().education_classes, (c) => String(c.status || 'active'));
+}
+
+export function getMemberRequestsByStatus(): ChartPoint[] {
+  return countBy(getStore().member_requests, (r) => String(r.status || 'pending'));
+}
+
+export function getWorshipByType(): ChartPoint[] {
+  return countBy(getStore().worship_schedules, (w) => String(w.service_type || w.ritual_type || 'service'));
+}
+
+export function getEventRegistrations(): ChartPoint[] {
+  return countBy(getStore().event_registrations, (r) => String(r.status || 'registered'));
+}
+
+export function getSecurityIncidents(): ChartPoint[] {
+  return countBy(getStore().security_incidents, (i) => String(i.severity || i.status || 'open'));
+}
+
+export function getAnnouncementsPublic(): ChartPoint[] {
+  const s = getStore();
+  return [
+    { name: 'Public', value: s.announcements.filter((a) => a.is_public === 1 || a.is_public === true).length },
+    { name: 'Internal', value: s.announcements.filter((a) => a.is_public !== 1 && a.is_public !== true).length },
+  ];
+}
+
 export type ChartId =
   | 'donations_timeline'
   | 'donations_type'
@@ -132,7 +164,14 @@ export type ChartId =
   | 'volunteer_tasks'
   | 'inventory_stock'
   | 'visits'
-  | 'module_counts';
+  | 'module_counts'
+  | 'maintenance_status'
+  | 'education_status'
+  | 'member_requests'
+  | 'worship_type'
+  | 'event_registrations'
+  | 'security_incidents'
+  | 'announcements_split';
 
 export const CHART_BUILDERS: Record<ChartId, () => ChartPoint[]> = {
   donations_timeline: getDonationsTimeline,
@@ -148,7 +187,55 @@ export const CHART_BUILDERS: Record<ChartId, () => ChartPoint[]> = {
   inventory_stock: getInventoryStock,
   visits: getVisitsThisWeek,
   module_counts: getModuleCounts,
+  maintenance_status: getMaintenanceByStatus,
+  education_status: getEducationByStatus,
+  member_requests: getMemberRequestsByStatus,
+  worship_type: getWorshipByType,
+  event_registrations: getEventRegistrations,
+  security_incidents: getSecurityIncidents,
+  announcements_split: getAnnouncementsPublic,
 };
+
+/** Page slug → extra charts (merged with role charts) */
+export const PAGE_CHART_IDS: Record<string, ChartId[]> = {
+  users: ['users_role', 'activity_role', 'module_counts'],
+  approvals: ['approvals_status', 'activity_action', 'finance_ie'],
+  donations: ['donations_timeline', 'donations_type', 'finance_ie'],
+  donate: ['donations_timeline', 'donations_type'],
+  'financial-transactions': ['finance_ie', 'donations_timeline', 'approvals_status'],
+  finances: ['finance_ie', 'donations_timeline', 'approvals_status'],
+  transactions: ['finance_ie', 'donations_timeline'],
+  events: ['events_type', 'event_registrations', 'volunteer_tasks'],
+  festivals: ['events_type', 'event_registrations'],
+  announcements: ['announcements_split', 'activity_action'],
+  settings: ['module_counts', 'activity_action'],
+  permissions: ['users_role', 'module_counts'],
+  'ritual-approval': ['rituals_status', 'worship_type', 'approvals_status'],
+  monitor: ['module_counts', 'activity_action', 'approvals_status'],
+  'system-control': ['module_counts', 'users_role', 'activity_role'],
+  reports: ['donations_timeline', 'finance_ie', 'module_counts'],
+  inventory: ['inventory_stock', 'module_counts'],
+  'inventory-management': ['inventory_stock', 'module_counts'],
+  'stock-monitor': ['inventory_stock', 'module_counts'],
+  maintenance: ['maintenance_status', 'volunteer_tasks'],
+  'maintenance-records': ['maintenance_status', 'approvals_status'],
+  education: ['education_status', 'module_counts'],
+  classes: ['education_status', 'event_registrations'],
+  security: ['security_incidents', 'visits'],
+  visits: ['visits', 'event_registrations'],
+  correspondence: ['activity_action', 'module_counts'],
+  records: ['module_counts', 'activity_action'],
+  'book-ritual': ['rituals_status', 'worship_type'],
+  'member-requests': ['member_requests', 'approvals_status'],
+};
+
+/** Public / guest preview charts */
+export const GUEST_CHART_IDS: ChartId[] = [
+  'module_counts',
+  'donations_timeline',
+  'activity_role',
+  'events_type',
+];
 
 /** Which charts each role sees on dashboard + reports */
 export const ROLE_CHARTS: Record<RoleKey, ChartId[]> = {
@@ -160,31 +247,38 @@ export const ROLE_CHARTS: Record<RoleKey, ChartId[]> = {
     'users_role',
     'finance_ie',
   ],
-  temple_administrator: ['module_counts', 'approvals_status', 'activity_action', 'events_type', 'volunteer_tasks'],
-  head_priest: ['rituals_status', 'activity_action', 'donations_timeline'],
-  priest: ['rituals_status', 'donations_timeline', 'activity_action'],
-  temple_secretary: ['activity_action', 'module_counts', 'visits'],
+  temple_administrator: [
+    'module_counts',
+    'approvals_status',
+    'activity_action',
+    'events_type',
+    'volunteer_tasks',
+    'finance_ie',
+  ],
+  head_priest: ['rituals_status', 'worship_type', 'activity_action', 'donations_timeline'],
+  priest: ['rituals_status', 'worship_type', 'donations_timeline', 'activity_action'],
+  temple_secretary: ['activity_action', 'module_counts', 'visits', 'member_requests'],
   treasurer: ['donations_timeline', 'donations_type', 'finance_ie', 'approvals_status'],
   accountant: ['finance_ie', 'donations_timeline', 'approvals_status', 'activity_action'],
-  donation_manager: ['donations_timeline', 'donations_type', 'activity_action'],
-  event_manager: ['events_type', 'volunteer_tasks', 'visits', 'activity_action'],
-  volunteer_coordinator: ['volunteer_tasks', 'events_type', 'activity_action'],
+  donation_manager: ['donations_timeline', 'donations_type', 'activity_action', 'finance_ie'],
+  event_manager: ['events_type', 'event_registrations', 'volunteer_tasks', 'visits'],
+  volunteer_coordinator: ['volunteer_tasks', 'events_type', 'activity_action', 'event_registrations'],
   volunteer: ['volunteer_tasks', 'events_type', 'activity_action'],
-  member: ['events_type', 'rituals_status', 'donations_timeline'],
+  member: ['events_type', 'rituals_status', 'donations_timeline', 'member_requests'],
   devotee: ['rituals_status', 'donations_timeline', 'events_type'],
   visitor: ['visits', 'events_type', 'activity_action'],
-  ritual_coordinator: ['rituals_status', 'activity_action', 'approvals_status'],
-  education_coordinator: ['module_counts', 'activity_action', 'users_role'],
-  teacher_instructor: ['activity_action', 'module_counts'],
+  ritual_coordinator: ['rituals_status', 'worship_type', 'activity_action', 'approvals_status'],
+  education_coordinator: ['education_status', 'module_counts', 'activity_action', 'users_role'],
+  teacher_instructor: ['education_status', 'activity_action', 'module_counts'],
   inventory_manager: ['inventory_stock', 'module_counts', 'activity_action'],
-  maintenance_staff: ['volunteer_tasks', 'approvals_status', 'activity_action'],
-  security_guard: ['visits', 'activity_action', 'approvals_status'],
+  maintenance_staff: ['maintenance_status', 'volunteer_tasks', 'approvals_status', 'activity_action'],
+  security_guard: ['security_incidents', 'visits', 'activity_action', 'approvals_status'],
 };
 
 export const CHART_META: Record<ChartId, { title: string; type: 'bar' | 'pie' | 'area' | 'line' | 'radial' }> = {
   donations_timeline: { title: '💰 Donations flow', type: 'area' },
   donations_type: { title: '🎁 Donations by type', type: 'pie' },
-  activity_action: { title: '⚡ CRUD actions', type: 'bar' },
+  activity_action: { title: '⚡ Temple actions', type: 'bar' },
   activity_role: { title: '👥 Activity by role', type: 'bar' },
   approvals_status: { title: '✅ Approvals pipeline', type: 'pie' },
   rituals_status: { title: '📿 Ritual requests', type: 'pie' },
@@ -195,12 +289,43 @@ export const CHART_META: Record<ChartId, { title: string; type: 'bar' | 'pie' | 
   inventory_stock: { title: '📦 Stock levels', type: 'bar' },
   visits: { title: '🚶 Visits', type: 'line' },
   module_counts: { title: '📊 Temple modules', type: 'bar' },
+  maintenance_status: { title: '🔧 Maintenance', type: 'pie' },
+  education_status: { title: '📚 Classes', type: 'bar' },
+  member_requests: { title: '🙏 Member requests', type: 'pie' },
+  worship_type: { title: '🕉️ Worship schedule', type: 'bar' },
+  event_registrations: { title: '📝 Registrations', type: 'bar' },
+  security_incidents: { title: '🛡️ Security', type: 'pie' },
+  announcements_split: { title: '📢 Announcements', type: 'pie' },
 };
 
-export function getChartsForRole(role: RoleKey): { id: ChartId; data: ChartPoint[]; meta: (typeof CHART_META)[ChartId] }[] {
-  return ROLE_CHARTS[role].map((id) => ({
+export type ChartVariant = 'compact' | 'page' | 'full' | 'strip' | 'guest';
+
+function resolveChartIds(role: RoleKey | undefined, slug: string | undefined, variant: ChartVariant): ChartId[] {
+  if (variant === 'guest') return GUEST_CHART_IDS;
+  const roleIds = role ? ROLE_CHARTS[role] ?? ROLE_CHARTS.visitor : GUEST_CHART_IDS;
+  const pageIds = slug ? PAGE_CHART_IDS[slug] : undefined;
+  const merged = [...new Set([...(pageIds ?? []), ...roleIds])];
+  if (variant === 'compact' || variant === 'strip') return merged.slice(0, 3);
+  if (variant === 'page') return merged.slice(0, 4);
+  return merged;
+}
+
+function buildChartList(ids: ChartId[]) {
+  return ids.map((id) => ({
     id,
     data: CHART_BUILDERS[id](),
     meta: CHART_META[id],
   }));
+}
+
+export function getChartsForRole(role: RoleKey) {
+  return buildChartList(ROLE_CHARTS[role]);
+}
+
+export function getChartsForPage(role: RoleKey, slug: string, variant: ChartVariant = 'page') {
+  return buildChartList(resolveChartIds(role, slug, variant));
+}
+
+export function getGuestCharts() {
+  return buildChartList(GUEST_CHART_IDS);
 }

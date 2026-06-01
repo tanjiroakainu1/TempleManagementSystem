@@ -17,6 +17,13 @@ const MEGA_CHARTS: ChartId[] = [
   'volunteer_tasks',
   'inventory_stock',
   'visits',
+  'maintenance_status',
+  'education_status',
+  'member_requests',
+  'worship_type',
+  'event_registrations',
+  'security_incidents',
+  'announcements_split',
 ];
 
 interface Props {
@@ -38,9 +45,9 @@ export default function TempleChartsMega({ version }: Props) {
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border-2 border-candy-300 bg-gradient-to-r from-candy-200 via-candy-100 to-white p-4 shadow-candy">
-        <p className="font-display font-bold text-candy-900 text-lg">Temple Analytics — Overview</p>
+        <p className="font-display font-bold text-candy-900 text-lg">📈 Crazy Charts — Temple Overview</p>
         <p className="text-sm text-candy-700 mt-1">
-          Live temple metrics — updates when you create, approve, or delete records.
+          Full analytics wall — updates when you create, approve, or delete records.
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">

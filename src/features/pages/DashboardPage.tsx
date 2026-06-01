@@ -5,6 +5,7 @@ import { useDataVersion } from '@/context/DataContext';
 import { dataApi } from '@/lib/api';
 import { formatMoney } from '@/lib/utils';
 import StatCard from '@/components/ui/StatCard';
+import { RoleDashboardCharts } from '@/components/charts';
 import { getNavItems } from '@/config/navigation';
 
 export default function DashboardPage() {
@@ -47,6 +48,7 @@ export default function DashboardPage() {
         <h1 className="font-display text-xl sm:text-2xl font-bold text-maroon">Dashboard</h1>
         <p className="text-sm sm:text-base text-slate-500 truncate">Welcome back, {user?.full_name}</p>
       </div>
+      <RoleDashboardCharts role={user!.role} version={version} slug="dashboard" />
       {statEntries.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {statEntries.map(([key, val], i) => (

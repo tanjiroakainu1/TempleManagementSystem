@@ -2,10 +2,10 @@ import { useState, FormEvent, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth, getRoleFolder } from '@/context/AuthContext';
 import { DEMO_ACCOUNTS, findDemoByEmail } from '@/config/demoAccounts';
+import { UI_LABELS } from '@/config/uiLabels';
 import RoleQuickAccess from '@/components/auth/RoleQuickAccess';
-import GuestNav from '@/components/guest/GuestNav';
-import GuestFooter from '@/components/guest/GuestFooter';
-import GuestAuthHero from '@/components/guest/GuestAuthHero';
+import { GuestNav, GuestFooter, GuestAuthHero, GuestAuthCard, GuestTrustStrip } from '@/components/guest';
+import GuestCrazyCharts from '@/components/charts/GuestCrazyCharts';
 import DeveloperCredit from '@/components/layout/DeveloperCredit';
 
 export default function Login() {
@@ -25,13 +25,14 @@ export default function Login() {
 
   if (loading) {
     return (
-      <div className="min-h-[100dvh] flex flex-col bg-cream">
+      <div className="min-h-[100dvh] flex flex-col bg-gradient-to-b from-candy-100 via-cream to-white">
         <GuestNav />
-        <div className="flex-1 flex items-center justify-center px-4">
-          <div className="text-center space-y-3">
-            <p className="text-candy-600 font-bold animate-pulse">Opening temple portal…</p>
-            <DeveloperCredit variant="mini" />
+        <div className="flex-1 flex flex-col items-center justify-center px-4 gap-6">
+          <div className="h-14 w-14 rounded-2xl bg-candy-100 border border-candy-200 flex items-center justify-center text-3xl animate-pulse">
+            🛕
           </div>
+          <p className="text-candy-700 font-bold">Opening temple portal…</p>
+          <DeveloperCredit variant="mini" />
         </div>
       </div>
     );
@@ -71,26 +72,32 @@ export default function Login() {
     <div className="min-h-[100dvh] flex flex-col bg-gradient-to-b from-candy-100 via-cream to-white">
       <GuestNav />
       <GuestAuthHero
+        badge={UI_LABELS.loginHeroBadge}
         title="Welcome back"
-        subtitle="Sign in with your Gmail demo account or use Quick Access to jump into any of the 20 temple roles instantly."
+        subtitle={UI_LABELS.loginHeroSubtitle}
         alternate={{ prompt: 'New here?', label: 'Create an account', to: '/register' }}
       />
 
+      <section className="relative -mt-4 z-10 px-4 sm:px-6">
+        <GuestTrustStrip />
+      </section>
+
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-          {/* Sign-in card */}
           <div className="lg:col-span-5">
-            <div className="rounded-2xl border border-candy-200 bg-white p-6 sm:p-8 shadow-candy-lg sticky top-24">
-              <div className="flex items-center gap-3 mb-6">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-candy-100 text-2xl border border-candy-200">
-                  🔐
-                </span>
-                <div>
-                  <h2 className="font-display text-xl font-bold text-candy-900">Sign in</h2>
-                  <p className="text-xs text-candy-500">@gmail.com required for demo</p>
-                </div>
-              </div>
-
+            <GuestAuthCard
+              icon="🔐"
+              title="Sign in"
+              subtitle="@gmail.com required for demo"
+              className="lg:sticky lg:top-24"
+              footer={
+                <p className="text-center text-sm text-candy-600 mt-6 pt-5 border-t border-candy-100">
+                  <Link to="/" className="font-bold text-candy-800 hover:underline">
+                    ← Back to home
+                  </Link>
+                </p>
+              }
+            >
               {error && (
                 <div className="mb-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 text-sm">
                   {error}
@@ -163,18 +170,14 @@ export default function Login() {
                   ))}
                 </div>
               </div>
-
-              <p className="text-center text-sm text-candy-600 mt-6">
-                <Link to="/" className="font-bold text-candy-800 hover:underline">
-                  ← Back to home
-                </Link>
-              </p>
-            </div>
+            </GuestAuthCard>
           </div>
 
-          {/* Quick access */}
           <div className="lg:col-span-7 space-y-6">
             <div className="rounded-2xl border border-candy-200 bg-white p-5 sm:p-6 shadow-candy max-h-[min(70vh,720px)] overflow-y-auto">
+              <p className="text-xs font-bold uppercase tracking-wider text-candy-500 mb-4">
+                One-click demo access
+              </p>
               <RoleQuickAccess variant="login" />
             </div>
 
@@ -183,8 +186,8 @@ export default function Login() {
               open={showCredentials}
               onToggle={(e) => setShowCredentials((e.target as HTMLDetailsElement).open)}
             >
-              <summary className="cursor-pointer px-5 py-4 bg-candy-50 font-display font-bold text-candy-900 flex items-center justify-between list-none">
-                <span>📋 Full demo credentials table</span>
+              <summary className="cursor-pointer px-5 py-4 bg-gradient-to-r from-candy-50 to-white font-display font-bold text-candy-900 flex items-center justify-between list-none">
+                <span>📋 Full demo credentials</span>
                 <span className="text-candy-500 text-sm font-normal group-open:rotate-180 transition">
                   ▼
                 </span>
@@ -215,7 +218,7 @@ export default function Login() {
                   </tbody>
                 </table>
               </div>
-              <p className="px-5 py-3 text-xs text-candy-500 border-t border-candy-100">
+              <p className="px-5 py-3 text-xs text-candy-500 border-t border-candy-100 bg-candy-50/50">
                 Super Admin: <strong>admin123</strong> · All other roles: <strong>demo123</strong>
               </p>
             </details>
@@ -223,6 +226,13 @@ export default function Login() {
         </div>
 
         <DeveloperCredit variant="banner" />
+
+        <div className="pt-8 border-t border-candy-200 space-y-6">
+          <p className="text-center text-xs font-bold uppercase tracking-wider text-candy-500">
+            Preview · live temple analytics
+          </p>
+          <GuestCrazyCharts variant="strip" />
+        </div>
       </main>
 
       <GuestFooter />

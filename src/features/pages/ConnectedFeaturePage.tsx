@@ -2,6 +2,9 @@ import { useState, FormEvent, useMemo } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { PAGE_DESCRIPTIONS } from '@/config/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useDataVersion } from '@/context/DataContext';
+import { CrazyChartsBlock } from '@/components/charts';
+import { UI_LABELS } from '@/config/uiLabels';
 import { dataApi } from '@/lib/api';
 import { useData } from '@/hooks/useData';
 import type { EntityTable } from '@/lib/storage/services';
@@ -206,6 +209,7 @@ export default function ConnectedFeaturePage() {
     table: undefined,
   };
   const { user } = useAuth();
+  const version = useDataVersion();
   const [msg, setMsg] = useState('');
 
   const loader = async () => {
@@ -269,6 +273,9 @@ export default function ConnectedFeaturePage() {
         <h1 className="font-display text-xl sm:text-2xl font-bold text-maroon">{config.title}</h1>
         <p className="text-slate-500">{description}</p>
       </div>
+      {user && slug !== 'dashboard' && (
+        <CrazyChartsBlock role={user.role} slug={configKey} version={version} variant="page" />
+      )}
       {msg && <div className="rounded-lg bg-emerald-50 text-emerald-800 px-4 py-2 text-sm">{msg}</div>}
       {config.form && config.table && (
         <Card>
@@ -281,7 +288,7 @@ export default function ConnectedFeaturePage() {
                   <input name={f.name} type={f.type || 'text'} required className="input-candy" />
                 </div>
               ))}
-              <div className="md:col-span-2"><Button type="submit">Save</Button></div>
+              <div className="md:col-span-2"><Button type="submit">{UI_LABELS.saveButton}</Button></div>
             </form>
           </CardBody>
         </Card>
@@ -390,7 +397,7 @@ function SettingsPanel() {
                 <input name={key} defaultValue={s[key]} className="input-candy" />
               </div>
             ))}
-            <Button type="submit">Save Settings</Button>
+            <Button type="submit">{UI_LABELS.saveSettings}</Button>
           </form>
         </CardBody>
       </Card>

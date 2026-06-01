@@ -1,9 +1,9 @@
 /**
- * UI privacy — backend still uses localStorage + activity_log silently.
+ * UI privacy — persistence and activity_log run silently in the background.
  * Set flags to true only for internal / admin debugging.
  */
 export const APP_PRIVACY = {
-  /** Show "localStorage" / store key in the UI */
+  /** Show internal datastore hints in the UI (keep false in production demos) */
   showStorageHints: false,
   /** Sidebar + header link to shared activity log */
   showSharedActivityNav: false,

@@ -213,5 +213,5 @@ export const PAGE_DESCRIPTIONS: Record<string, string> = {
   monitor: 'Monitor temple entrances and visitor flow.',
   incidents: 'Log and respond to security incidents.',
   visitors: 'View visitor registration log.',
-  'activity-log': 'Shared activity log — all CRUD actions from every role.',
+  'activity-log': 'Temple audit trail — actions from every role.',
 };

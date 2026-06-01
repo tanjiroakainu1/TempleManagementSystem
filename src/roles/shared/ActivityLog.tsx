@@ -6,7 +6,7 @@ import { dataApi } from '@/lib/api';
 import { APP_PRIVACY } from '@/config/privacy';
 import RolePageShell from '@/components/role/RolePageShell';
 import SharedActivityTable from '@/components/shared/SharedActivityTable';
-import { TempleChartsMega, RoleDashboardCharts } from '@/components/charts';
+import { TempleChartsMega, CrazyChartsBlock } from '@/components/charts';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { useData } from '@/hooks/useData';
 
@@ -35,10 +35,10 @@ export default function SharedActivityLog() {
       title="Activity Log"
       slug="activity-log"
       icon="📋"
-      description="System audit trail for administrators."
+      description="Temple audit trail for administrators."
       showSharedActivity={false}
     >
-      {user && <RoleDashboardCharts role={user.role} version={version} compact />}
+      {user && <CrazyChartsBlock role={user.role} slug="activity-log" version={version} variant="page" />}
       <TempleChartsMega version={version} />
 
       <Card>

@@ -17,10 +17,10 @@ import Badge from '@/components/ui/Badge';
 import StatCard from '@/components/ui/StatCard';
 import SharedActivityTable from '@/components/shared/SharedActivityTable';
 import CrudActivityNotice from '@/components/shared/CrudActivityNotice';
-import LocalStorageBadge from '@/components/shared/LocalStorageBadge';
 import DataLoadState from '@/components/shared/DataLoadState';
-import { RoleDashboardCharts, TempleChartsMega } from '@/components/charts';
+import { CrazyChartsBlock, RoleDashboardCharts, TempleChartsMega } from '@/components/charts';
 import { APP_PRIVACY, CRUD_SUCCESS_MSG } from '@/config/privacy';
+import { UI_LABELS } from '@/config/uiLabels';
 import RoleCapabilitiesCard from '@/roles/_lib/RoleCapabilitiesCard';
 import DeveloperCredit from '@/components/layout/DeveloperCredit';
 import { DEVELOPER } from '@/config/developer';
@@ -310,7 +310,7 @@ function PageBody({
     return <DonateView def={def} slug={slug} version={version} />;
   }
   if (def.type === 'donations' || def.type === 'donations-readonly') {
-    return <DonationsView def={def} slug={slug} version={version} role={role} readonly={def.type === 'donations-readonly'} />;
+    return <DonationsView def={def} slug={slug} version={version} readonly={def.type === 'donations-readonly'} />;
   }
   if (def.type === 'book-ritual') {
     return <BookRitualView def={def} slug={slug} version={version} />;
@@ -336,7 +336,7 @@ function PageBody({
     return <PermissionsView def={def} slug={slug} />;
   }
   if (def.type === 'system-control') {
-    return <SystemControlView def={def} slug={slug} version={version} />;
+    return <SystemControlView def={def} slug={slug} version={version} role={role} />;
   }
   if (def.type === 'reports') {
     return <ReportsView def={def} slug={slug} version={version} role={role} />;
@@ -395,7 +395,8 @@ function RoleDashboard({
         <p className="mt-1 text-lg font-bold text-candy-900">Welcome back, {user.full_name}</p>
       </div>
       <RoleCapabilitiesCard role={role} />
-      <RoleDashboardCharts role={role} version={version} />
+      <RoleDashboardCharts role={role} version={version} slug={slug} />
+      {(role === 'super_admin' || role === 'temple_administrator') && <TempleChartsMega version={version} />}
       {Object.keys(stats).length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Object.entries(stats).map(([key, val], i) => (
@@ -620,7 +621,7 @@ function EntityView({
                   <input name={f.name} type={f.type || 'text'} required={f.type !== 'number'} className="input-candy" />
                 </div>
               ))}
-              <div className="sm:col-span-2"><Button type="submit">Save to local storage</Button></div>
+              <div className="sm:col-span-2"><Button type="submit">{UI_LABELS.saveButton}</Button></div>
             </form>
           </CardBody>
         </Card>
@@ -687,7 +688,6 @@ function EntityView({
           </DataLoadState>
         </CardBody>
       </Card>
-      <RoleDashboardCharts role={role} version={version} compact />
     </RolePageShell>
   );
 }
@@ -795,7 +795,7 @@ function ApprovalsView({
   };
 
   return (
-    <RolePageShell title={def.title} slug={slug} icon={def.icon} actions={<LocalStorageBadge />}>
+    <RolePageShell title={def.title} slug={slug} icon={def.icon} charts={false}>
       {msg && <CrudActivityNotice message={msg} />}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -804,7 +804,7 @@ function ApprovalsView({
         <StatCard icon="❌" value={rejected.length} label="Rejected" variant="maroon" />
       </div>
 
-      <RoleDashboardCharts role={role} version={version} compact />
+      <CrazyChartsBlock role={role} slug={slug} version={version} variant="page" />
 
       <Card>
         <CardHeader title="Submit approval request" />
@@ -875,7 +875,7 @@ function ApprovalsView({
       <Card>
         <CardHeader title="All approvals" />
         <CardBody>
-          <DataLoadState loading={loading} error={error} empty={!rows.length} emptyMessage="No approvals in store.">
+          <DataLoadState loading={loading} error={error} empty={!rows.length} emptyMessage="No approvals yet.">
             <DataTable
               rows={rows}
               columns={[
@@ -974,7 +974,7 @@ function DonateView({ def, slug, version }: { def: RolePageDef; slug: string; ve
   );
 }
 
-function DonationsView({ def, slug, version, role, readonly }: { def: RolePageDef; slug: string; version: number; role: RoleKey; readonly?: boolean }) {
+function DonationsView({ def, slug, version, readonly }: { def: RolePageDef; slug: string; version: number; readonly?: boolean }) {
   const [msg, setMsg] = useState('');
   const { data, reload } = useData(() => dataApi.donations().then((r) => r.donations), [version]);
   const done = useCrudDone(reload, setMsg);
@@ -1011,7 +1011,6 @@ function DonationsView({ def, slug, version, role, readonly }: { def: RolePageDe
           <DataTable rows={(data || []) as Record<string, unknown>[]} columns={[{ key: 'donor_name', label: 'Donor' }, { key: 'amount', label: 'Amount', format: 'money' }, { key: 'donation_type', label: 'Type' }, { key: 'created_at', label: 'Date', format: 'datetime' }]} />
         </CardBody>
       </Card>
-      <RoleDashboardCharts role={role} version={version} compact />
     </RolePageShell>
   );
 }
@@ -1105,7 +1104,6 @@ function EventsView({ def, slug, version, festival, role }: { def: RolePageDef; 
           </div>
         </CardBody>
       </Card>
-      <RoleDashboardCharts role={role} version={version} compact />
     </RolePageShell>
   );
 }
@@ -1129,7 +1127,6 @@ function TransactionsView({ def, slug, version, role }: { def: RolePageDef; slug
   return (
     <RolePageShell title={def.title} slug={slug} icon={def.icon}>
       {msg && <CrudActivityNotice message={msg} />}
-      <RoleDashboardCharts role={role} version={version} compact />
       {canCreate && (
         <Card>
           <CardHeader title="New Transaction" />
@@ -1246,7 +1243,7 @@ function SettingsView({ def, slug, role, version }: { def: RolePageDef; slug: st
                 <input name={key} defaultValue={(data as Record<string, string>)?.[key]} className="input-candy" />
               </div>
             ))}
-            <Button type="submit">Save Settings</Button>
+            <Button type="submit">{UI_LABELS.saveSettings}</Button>
           </form>
         </CardBody>
       </Card>
@@ -1283,7 +1280,7 @@ function PermissionsView({ def, slug }: { def: RolePageDef; slug: string }) {
   );
 }
 
-function SystemControlView({ def, slug, version }: { def: RolePageDef; slug: string; version: number }) {
+function SystemControlView({ def, slug, version, role }: { def: RolePageDef; slug: string; version: number; role: RoleKey }) {
   const { data } = useData(async () => {
     const s = getStore();
     return [
@@ -1294,7 +1291,8 @@ function SystemControlView({ def, slug, version }: { def: RolePageDef; slug: str
     ];
   }, [version]);
   return (
-    <RolePageShell title={def.title} slug={slug} icon={def.icon}>
+    <RolePageShell title={def.title} slug={slug} icon={def.icon} charts={false}>
+      <RoleDashboardCharts role={role} version={version} slug={slug} />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {(data || []).map((m) => (
           <Card key={String(m.module)}>
@@ -1326,7 +1324,7 @@ function ReportsView({ def, slug, version, role }: { def: RolePageDef; slug: str
     return [...base, { report: 'Pending Approvals', value: s.approvals.filter((a) => a.status === 'pending').length }];
   }, [version, role]);
   return (
-    <RolePageShell title={def.title} slug={slug} icon={def.icon}>
+    <RolePageShell title={def.title} slug={slug} icon={def.icon} charts={false}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {(data || []).map((r, i) => (
           <Card key={i}>
@@ -1337,8 +1335,8 @@ function ReportsView({ def, slug, version, role }: { def: RolePageDef; slug: str
           </Card>
         ))}
       </div>
-      <RoleDashboardCharts role={role} version={version} />
-      {(role === 'super_admin' || role === 'temple_administrator') && <TempleChartsMega version={version} />}
+      <RoleDashboardCharts role={role} version={version} slug={slug} />
+      <TempleChartsMega version={version} />
     </RolePageShell>
   );
 }

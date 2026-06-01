@@ -1,11 +1,11 @@
 # Temple Management System — React (TypeScript + Tailwind)
 
-Standalone React frontend — **no server required**. All data lives in **localStorage** (`tms_store_v1`).
+Standalone React frontend — **no server required**. Temple data persists in the browser session (private client-side datastore).
 
 ## Stack
 
 - **Frontend:** React 18, TypeScript, Tailwind CSS, React Router, Vite
-- **Data:** Browser localStorage + **seed v2** (23 users, 8 donations, 6 rituals, 5 events, 25+ activity rows — all cross-linked)
+- **Data:** Client-side temple store + **seed v2** (23 users, 8 donations, 6 rituals, 5 events, 25+ activity rows — all cross-linked)
 - **Currency:** Philippine Peso (₱)
 - **Optional:** Express API in `server/` for MySQL sync (not used by default UI)
 
@@ -14,8 +14,8 @@ Standalone React frontend — **no server required**. All data lives in **localS
 ```
 src/
   config/          # roles, demo accounts, navigation
-  context/         # AuthContext, DataContext (localStorage refresh)
-  lib/storage/     # db, seed, services (all CRUD)
+  context/         # AuthContext, DataContext (data refresh)
+  lib/storage/     # db, seed, services (persistence layer)
   components/      # Layout, UI (StatCard, Card, Badge…)
   features/pages/  # Shared feature pages + ConnectedFeaturePage (role slugs)
   pages/           # Landing, Login, Register
@@ -69,7 +69,7 @@ All demo accounts use **@gmail.com**. On the login page you get:
 | Priest | priest@gmail.com | demo123 |
 | … (all 20 roles) | *@gmail.com | demo123 |
 
-Use **Quick Access** on login or any dashboard for one-click sign-in with seeded localStorage data.
+Use **Quick Access** on login or any dashboard for one-click sign-in with seeded demo data.
 
 ## 20 role routes
 
@@ -102,5 +102,5 @@ Shared: `/shared/activity-log` (all roles)
 
 - Auth, RBAC, 20 role portals
 - Donations, rituals, events, finance, announcements, approvals
-- Shared activity table (all roles, localStorage)
+- Shared activity table (all roles, client-side)
 - Philippine Peso (₱) formatting

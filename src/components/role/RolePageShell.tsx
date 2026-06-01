@@ -4,7 +4,10 @@ import { PAGE_DESCRIPTIONS } from '@/config/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useDataVersion } from '@/context/DataContext';
 import SharedActivityPreview from '@/components/shared/SharedActivityPreview';
+import { CrazyChartsBlock } from '@/components/charts';
+import type { ChartVariant } from '@/lib/chartData';
 import { APP_PRIVACY } from '@/config/privacy';
+import { defaultPageCharts } from '@/components/role/rolePageCharts';
 
 interface RolePageShellProps {
   title: string;
@@ -14,6 +17,8 @@ interface RolePageShellProps {
   children: ReactNode;
   actions?: ReactNode;
   showSharedActivity?: boolean;
+  /** Auto crazy charts — `true` uses page default; `false` disables */
+  charts?: boolean | ChartVariant;
 }
 
 export default function RolePageShell({
@@ -24,6 +29,7 @@ export default function RolePageShell({
   children,
   actions,
   showSharedActivity,
+  charts: chartsProp,
 }: RolePageShellProps) {
   const { user } = useAuth();
   const version = useDataVersion();
@@ -32,6 +38,18 @@ export default function RolePageShell({
   const showActivity =
     APP_PRIVACY.showSharedActivityPreview &&
     (showSharedActivity ?? (slug !== undefined && slug !== 'dashboard' && slug !== 'activity-log'));
+
+  const chartVariant: false | ChartVariant =
+    chartsProp === false
+      ? false
+      : chartsProp === true || chartsProp === undefined
+        ? defaultPageCharts(slug)
+        : chartsProp;
+
+  const chartBlock =
+    chartVariant && user && slug ? (
+      <CrazyChartsBlock role={user.role as RoleKey} slug={slug} version={version} variant={chartVariant} />
+    ) : null;
 
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in w-full min-w-0 max-w-full">
@@ -55,7 +73,10 @@ export default function RolePageShell({
           {actions && <div className="shrink-0 w-full lg:w-auto flex flex-wrap gap-2">{actions}</div>}
         </div>
       </div>
-      <div className="w-full min-w-0 max-w-full space-y-4 sm:space-y-6">{children}</div>
+      <div className="w-full min-w-0 max-w-full space-y-4 sm:space-y-6">
+        {chartBlock}
+        {children}
+      </div>
       {showActivity && <SharedActivityPreview version={version} />}
     </div>
   );

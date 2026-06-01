@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useAuth, getRoleFolder } from '@/context/AuthContext';
+import { useDataVersion } from '@/context/DataContext';
 import type { RoleKey } from '@/config/roles';
 import type { RoleFolderProfile } from '@/config/roleProfiles';
 import { getNavItems } from '@/config/navigation';
 import RolePageShell from '@/components/role/RolePageShell';
+import { CrazyChartsBlock } from '@/components/charts';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import DeveloperCredit from '@/components/layout/DeveloperCredit';
@@ -15,13 +17,15 @@ interface Props {
 
 export default function RoleProfilePage({ role, profile }: Props) {
   const { user } = useAuth();
+  const version = useDataVersion();
   const folder = getRoleFolder(role);
   const nav = getNavItems(role).filter((n) => !n.shared && n.slug !== 'profile');
 
   const isCurrentRole = user?.role === role;
 
   return (
-    <RolePageShell title="Role Profile" slug="profile" icon="👤" description={profile.summary}>
+    <RolePageShell title="Role Profile" slug="profile" icon="👤" description={profile.summary} charts={false}>
+      <CrazyChartsBlock role={role} slug="profile" version={version} variant="page" />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="lg:col-span-1 border-candy-300/60 overflow-hidden">
           <div className="bg-gradient-to-br from-candy-600 via-candy-700 to-candy-800 px-5 py-8 text-center text-white">
