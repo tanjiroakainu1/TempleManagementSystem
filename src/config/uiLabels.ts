@@ -23,4 +23,11 @@ export const UI_LABELS = {
     'Sign in with your Gmail demo account, or use Quick Access to experience any of the 20 temple roles in one click.',
   loginHeroBadge: 'Secure temple portal',
   registerHeroBadge: 'Join the community',
+  headerHome: 'Home',
+  headerLogout: 'Logout',
+  headerSwitchRole: 'Switch role',
+  headerSwitchRoleShort: 'Switch',
+  headerPublicSite: 'Public site',
+  headerAlerts: 'Alerts',
+  headerProfile: 'Profile',
 } as const;
