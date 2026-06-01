@@ -27,11 +27,11 @@ function ActionLabel({
 }) {
   return (
     <>
-      {icon && (
+      {icon ? (
         <span className="text-base leading-none shrink-0" aria-hidden>
           {icon}
         </span>
-      )}
+      ) : null}
       {shortLabel ? (
         <>
           <span className="sm:hidden">{shortLabel}</span>

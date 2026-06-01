@@ -394,11 +394,8 @@ function RoleDashboard({
         </p>
         <p className="mt-1 text-lg font-bold text-candy-900">Welcome back, {user.full_name}</p>
       </div>
-      <RoleCapabilitiesCard role={role} />
-      <RoleDashboardCharts role={role} version={version} slug={slug} />
-      {(role === 'super_admin' || role === 'temple_administrator') && <TempleChartsMega version={version} />}
       {Object.keys(stats).length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {Object.entries(stats).map(([key, val], i) => (
             <StatCard
               key={key}
@@ -410,8 +407,11 @@ function RoleDashboard({
           ))}
         </div>
       )}
+      <RoleCapabilitiesCard role={role} />
+      <RoleDashboardCharts role={role} version={version} slug={slug} />
+      {(role === 'super_admin' || role === 'temple_administrator') && <TempleChartsMega version={version} />}
       <Card>
-        <CardHeader title="Quick Actions" />
+        <CardHeader title="Quick actions" />
         <CardBody>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {nav.map((item) => (

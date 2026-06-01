@@ -137,7 +137,7 @@ export default function TempleWisdomChat() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className={`temple-wisdom-fab tap-target fixed z-[110] flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-candy-700 via-candy-600 to-candy-500 text-white shadow-candy-lg border-2 border-white/40 font-bold transition-all touch-manipulation
+        className={`temple-wisdom-fab tap-target fixed z-[110] flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-zinc-700 via-zinc-600 to-zinc-800 text-white shadow-candy-lg border-2 border-white/30 font-bold transition-all touch-manipulation
           min-h-[52px] min-w-[52px] sm:min-h-[48px]
           bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-[max(0.75rem,env(safe-area-inset-right))]
           px-3.5 py-3 sm:px-5 sm:py-3
@@ -169,7 +169,7 @@ export default function TempleWisdomChat() {
           aria-modal="true"
           aria-label="Temple Wisdom chat"
         >
-          <header className="shrink-0 safe-top bg-gradient-to-r from-candy-700 via-candy-600 to-candy-500 text-white px-3 py-3 sm:px-4 flex items-center gap-2 sm:gap-3 min-h-[56px]">
+          <header className="shrink-0 safe-top bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-600 text-white px-3 py-3 sm:px-4 flex items-center gap-2 sm:gap-3 min-h-[56px]">
             <span className="text-2xl sm:text-3xl drop-shadow shrink-0">🛕</span>
             <div className="min-w-0 flex-1">
               <h2 className="font-display font-bold text-sm sm:text-base leading-tight truncate">
@@ -195,7 +195,7 @@ export default function TempleWisdomChat() {
           </header>
 
           {/* Drag handle — mobile sheet affordance */}
-          <div className="sm:hidden flex justify-center py-1.5 bg-gradient-to-r from-candy-700 via-candy-600 to-candy-500 shrink-0">
+          <div className="sm:hidden flex justify-center py-1.5 bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-600 shrink-0">
             <span className="w-10 h-1 rounded-full bg-white/40" />
           </div>
 

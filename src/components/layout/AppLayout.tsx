@@ -5,18 +5,8 @@ import { getNavItems } from '@/config/navigation';
 import { getRoleLabel } from '@/config/roles';
 import { ROLES } from '@/config/roles';
 import DeveloperCredit from '@/components/layout/DeveloperCredit';
-import HomeButton from '@/components/layout/HomeButton';
-import AppHeaderActions from '@/components/layout/AppHeaderActions';
-
-function userInitials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((p) => p[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase() || 'TU';
-}
+import AppTopBar from '@/components/layout/AppTopBar';
+import SidebarFooterActions from '@/components/layout/SidebarFooterActions';
 
 function SidebarShell({
   folder,
@@ -24,14 +14,18 @@ function SidebarShell({
   onNavigate,
   showClose,
   onClose,
-  headerActions,
+  footer,
+  roleLabel,
+  roleIcon,
 }: {
   folder: string;
   nav: ReturnType<typeof getNavItems>;
   onNavigate?: () => void;
   showClose?: boolean;
   onClose?: () => void;
-  headerActions?: ReactNode;
+  footer?: ReactNode;
+  roleLabel: string;
+  roleIcon: string;
 }) {
   const dashboardPath = `/${folder}/dashboard`;
 
@@ -59,6 +53,13 @@ function SidebarShell({
         )}
       </div>
 
+      <div className="px-4 py-2 border-b border-white/10 shrink-0">
+        <span className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 px-3 py-2 text-xs font-bold text-white">
+          <span>{roleIcon}</span>
+          <span className="truncate">{roleLabel}</span>
+        </span>
+      </div>
+
       <nav className="flex-1 overflow-y-auto overscroll-contain px-3 py-4">
         <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-candy-200/60">
           Navigation
@@ -71,8 +72,9 @@ function SidebarShell({
                 key={item.slug}
                 to={to}
                 onClick={onNavigate}
+                end={item.slug === 'dashboard'}
                 className={({ isActive }) =>
-                  `nav-app-link flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm min-h-[44px] sm:min-h-[42px] ${
+                  `nav-app-link flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm min-h-[44px] ${
                     isActive ? 'nav-app-link-active' : 'nav-app-link-idle'
                   }`
                 }
@@ -86,7 +88,7 @@ function SidebarShell({
       </nav>
 
       <div className="p-3 sm:p-4 border-t border-white/10 shrink-0 space-y-3">
-        {headerActions}
+        {footer}
         <DeveloperCredit variant="sidebar" />
       </div>
     </>
@@ -118,7 +120,6 @@ export default function AppLayout() {
   const folder = getRoleFolder(user.role);
   const roleInfo = ROLES[user.role];
   const roleLabel = getRoleLabel(user.role);
-  const initials = userInitials(user.full_name);
 
   const handleLogout = () => {
     setMenuOpen(false);
@@ -132,55 +133,38 @@ export default function AppLayout() {
     navigate('/login');
   };
 
-  const headerActions = (
-    <AppHeaderActions
-      folder={folder}
-      roleIcon={roleInfo.icon}
-      roleLabel={roleLabel}
-      userName={user.full_name}
-      initials={initials}
-      onLogout={handleLogout}
-      onSwitchRole={handleSwitchRole}
-    />
-  );
-
-  const sidebarActions = (
-    <AppHeaderActions
-      folder={folder}
-      roleIcon={roleInfo.icon}
-      roleLabel={roleLabel}
-      userName={user.full_name}
-      initials={initials}
-      onLogout={handleLogout}
-      onSwitchRole={handleSwitchRole}
-      layout="stack"
-    />
-  );
+  const sidebarFooter = <SidebarFooterActions folder={folder} onSwitchRole={handleSwitchRole} />;
 
   return (
     <div className="flex min-h-[100dvh] w-full max-w-[100vw] bg-slate-100">
-      {/* Desktop sidebar */}
-      <aside className="app-sidebar hidden lg:flex w-[260px] xl:w-[280px] shrink-0 flex-col text-white">
-        <SidebarShell folder={folder} nav={nav} headerActions={sidebarActions} />
+      <aside className="app-sidebar hidden md:flex w-[240px] lg:w-[260px] xl:w-[280px] shrink-0 flex-col text-white">
+        <SidebarShell
+          folder={folder}
+          nav={nav}
+          roleLabel={roleLabel}
+          roleIcon={roleInfo.icon}
+          footer={sidebarFooter}
+        />
       </aside>
 
-      {/* Mobile drawer */}
       {menuOpen && (
         <>
           <button
             type="button"
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
             onClick={() => setMenuOpen(false)}
             aria-label="Close menu overlay"
           />
-          <aside className="app-sidebar fixed inset-y-0 left-0 z-50 w-[min(100vw-3rem,280px)] flex flex-col text-white animate-drawer-in lg:hidden">
+          <aside className="app-sidebar fixed inset-y-0 left-0 z-50 w-[min(100vw-3rem,280px)] flex flex-col text-white animate-drawer-in md:hidden">
             <SidebarShell
               folder={folder}
               nav={nav}
+              roleLabel={roleLabel}
+              roleIcon={roleInfo.icon}
               onNavigate={() => setMenuOpen(false)}
               showClose
               onClose={() => setMenuOpen(false)}
-              headerActions={sidebarActions}
+              footer={sidebarFooter}
             />
           </aside>
         </>
@@ -188,28 +172,23 @@ export default function AppLayout() {
 
       <div className="flex-1 flex flex-col min-w-0 w-full">
         <header className="app-topbar sticky top-0 z-30 safe-top shrink-0">
-          <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2.5 sm:py-3 min-h-[56px] w-full min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 lg:px-5 py-2.5 min-h-[56px] w-full min-w-0">
             <button
               type="button"
-              className="lg:hidden tap-target shrink-0 rounded-lg border border-white/30 bg-white/15 text-white font-bold text-lg"
+              className="md:hidden tap-target shrink-0 rounded-lg border border-white/30 bg-white/15 text-white font-bold text-lg leading-none"
               onClick={() => setMenuOpen(true)}
               aria-label="Open menu"
             >
               ☰
             </button>
 
-            <HomeButton to={`/${folder}/dashboard`} />
-
-            <Link
-              to={`/${folder}/dashboard`}
-              className="font-display font-bold text-white/90 text-sm truncate min-w-0 hidden md:inline max-w-[140px] lg:max-w-none"
-            >
-              🛕 Temple MS
-            </Link>
-
-            <div className="flex-1 min-w-0" />
-
-            {headerActions}
+            <AppTopBar
+              folder={folder}
+              roleIcon={roleInfo.icon}
+              roleLabel={roleLabel}
+              userName={user.full_name}
+              onLogout={handleLogout}
+            />
           </div>
         </header>
 

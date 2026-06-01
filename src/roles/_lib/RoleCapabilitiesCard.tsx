@@ -19,8 +19,7 @@ export default function RoleCapabilitiesCard({ role }: Props) {
       <CardHeader title={`${cap.order}. ${cap.title} — Your Responsibilities`} />
       <CardBody className="space-y-4">
         <p className="text-sm text-candy-600 -mt-2">
-          Each sidebar link opens a dedicated page in{' '}
-          <code className="text-xs bg-candy-100 text-candy-800 px-1.5 py-0.5 rounded-lg">src/roles/{folder}/</code>
+          Use the sidebar or the module links below to open each part of your {folder.replace(/-/g, ' ')} portal.
         </p>
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {cap.responsibilities.map((item) => (

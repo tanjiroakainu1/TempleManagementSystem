@@ -53,7 +53,7 @@
   .page-content {
     @apply flex-1 w-full min-w-0 overflow-x-hidden overflow-y-auto;
     @apply p-3 xs:p-4 sm:p-5 lg:p-6;
-    @apply pb-[max(1rem,env(safe-area-inset-bottom))];
+    @apply pb-[max(5rem,calc(1rem+env(safe-area-inset-bottom)))];
   }
 
   .table-scroll {
